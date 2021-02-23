@@ -1,0 +1,16 @@
+
+U
+java:S4719Ø"9Replace charset name argument with StandardCharsets.UTF_8(‰ğÁùÿÿÿÿ
+P
+java:S2864"4Iterate over the "entrySet" instead of the "keySet".(ÂêÏùÿÿÿÿ
+R	java:S125‹"<This block of commented-out lines of code should be removed.(Œï¡
+[
+java:S1124"EReorder the modifiers to comply with the Java Language Specification.(ÈÏŠî
+O	java:S106ì"9Replace this use of System.out or System.err by a logger.(­ÊŞ¡
+T	java:S106í"9Replace this use of System.out or System.err by a logger.(ê–å øÿÿÿÿ
+W	java:S125÷"<This block of commented-out lines of code should be removed.(Ò¤¢ÿùÿÿÿÿ
+‚
+java:S2178Ü"fCorrect this "&" to "&&" and extract the right operand to a variable if it should always be evaluated.(ÖìÒƒüÿÿÿÿ
+T	java:S106å"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ
+O	java:S106İ"9Replace this use of System.out or System.err by a logger.(†÷Ë
+O	java:S106ê"9Replace this use of System.out or System.err by a logger.(ÙÀ„

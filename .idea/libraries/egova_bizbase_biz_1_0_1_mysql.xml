@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="egova-bizbase-biz-1.0.1-mysql">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../wizdom-urban-v14/app/target/egova-app/WEB-INF/lib/egova-bizbase-biz-1.0.1-mysql.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
