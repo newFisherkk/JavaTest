@@ -1,5 +1,6 @@
 package cn.com.egova;
 
+import cn.com.egova.base.tools.BeanUtils;
 import cn.com.egova.base.tools.DateUtils;
 import cn.com.egova.bean.CreatorDTO;
 import cn.com.egova.bean.MediaParams;
@@ -16,6 +17,7 @@ import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import javafx.beans.binding.ObjectExpression;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import sun.misc.BASE64Encoder;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -24,8 +26,13 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.FutureTask;
+
+import static java.lang.Thread.*;
 
 public class Test {
     
@@ -88,7 +95,7 @@ public class Test {
     }
     
     @org.junit.Test
-    public void testJsonUtil(){
+    public void testFastJsonApi(){
         Map<String, Object> map = new HashMap<>(7);
         map.put("clientId",1);
         map.put("redirectUri",2);
@@ -108,6 +115,14 @@ public class Test {
         params.put("patrolFlag",0);
         params.put("userName",1);
         params.put("password","");
+        ArrayList<JSONObject> objects = new ArrayList<>();
+        for(int i=0;i<3;i++){
+            JSONObject objectInArray = new JSONObject();
+            objectInArray.put("user","ahan"+i);
+            objectInArray.put("age",i);
+            objects.add(objectInArray);
+        }
+        params.put("array",objects);
         System.out.println("JSONObject:"+params.toJSONString());
     }
     
@@ -151,7 +166,8 @@ public class Test {
         try{
             Object s = "ss";
             Integer i =  (Integer) s;
-        } catch (Exception e){
+            //未匹配的异常不会catch
+        } catch (FormatterClosedException e){
             System.out.println("e.messgae:"+e.getMessage()+",e.cause:"+e.getCause()+",e:"+e);
             try {
                 throw new Exception("出错了");
@@ -166,17 +182,6 @@ public class Test {
         String hour ="5";
         Float aFloat = Float.valueOf(hour);
         System.out.println(aFloat/8);
-    }
-
-    @org.junit.Test
-    public void testStrArrToHashMap(){
-        String str ="[{\"mediaSize\":\"734733\",\"msgType\":\"1\",\"cardID\":\"100676\",\"msgID\":\"1\",\"mediaType\":\"0\",\"dealType\":\"-1\",\"taskID\":\"0\",\"mediaName\":\"egova_8_20200622094708472.jpg\",\"order\":\"1\",\"mediaUsage\":\"上报\"},{\"mediaSize\":\"146198\",\"msgType\":\"1\",\"cardID\":\"100676\",\"msgID\":\"1\",\"mediaType\":\"0\",\"dealType\":\"-1\",\"taskID\":\"0\",\"mediaName\":\"egova_7579_20200710100046674.jpg\",\"order\":\"2\",\"mediaUsage\":\"上报\"}]";
-        ArrayList<HashMap<String,String>> list = JsonUtil.getObject(str, ArrayList.class);//这个实际得到得是linkedTreeMap
-        List<MediaParams> params = JsonUtil.getList(str,  new TypeToken<List<MediaParams>>(){}.getType());
-        List<HashMap<String,String>> maps = JsonUtil.getList(str,  new TypeToken<List<HashMap>>(){}.getType()); //这个才能得到真正的hashMap
-        System.out.println(list.get(0));
-        System.out.println(params.get(0));
-        System.out.println(maps.get(0));
     }
     
     @org.junit.Test
@@ -347,6 +352,7 @@ public class Test {
     @org.junit.Test
     public  void Obj2Map() throws UnsupportedEncodingException {
         CreatorDTO creatorDTO = new CreatorDTO("hello", "test", "afsdfad");
+        System.out.println(JSON.toJSON(creatorDTO));
         creatorDTO.setMoney(0.2f);
         Map<String,Object> videoCellInfo = (Map<String,Object>) JSON.toJSON(creatorDTO);
         System.out.println(videoCellInfo);
@@ -379,10 +385,12 @@ public class Test {
     @org.junit.Test
     public  void testTypeParse(){
         Long a = 1L;
-        int b = new Long(a).intValue();
+        int b = a.intValue();
         System.out.println(b);
         int c = 3;
         long d = c;
+        //从二进制角度考虑，长转短需要强转将高位置为0，短转长只需要将高位补0
+        int e = (int) d;
         System.out.println(d);
     }
 
@@ -398,5 +406,52 @@ public class Test {
         System.out.println((double) c/(3600*1000));
         System.out.println(d);
         System.out.println((String)obj);
+        Float workHours = 3.155895f;
+        System.out.println(workHours.intValue());
+        System.out.println((int)((workHours-workHours.intValue())*60f));
     }
+
+    @org.junit.Test
+    public  void testTime() throws InterruptedException {
+        Calendar calendar = Calendar.getInstance();
+        LocalDate date = LocalDate.now();
+        LocalTime time = LocalTime.now();
+        LocalTime specfixTime = LocalTime.of(16, 36, 0);
+        LocalDate minusDate = date.minusDays(2);
+        LocalDateTime dateTime = LocalDateTime.now();
+        System.out.println("calendar.getTimeInMillis():"+calendar.getTimeInMillis()+",calendar.getTime().getTime():"+calendar.getTime().getTime());
+        System.out.println("calendar object:"+calendar);
+        System.out.println("LocalDate Object:"+date);
+        System.out.println("LocalDate minusDate:"+minusDate);
+        System.out.println("LocalTime Object:"+time);
+        System.out.println("LocalTime isAfter:"+ (time.isAfter(specfixTime)));
+        System.out.println("LocalDateTime:"+ dateTime);
+        sleep(10000);
+        LocalTime time2 = LocalTime.now();
+        Calendar calendar2 = Calendar.getInstance();
+        System.out.println(calendar2.getTimeInMillis()-calendar.getTimeInMillis());
+    }
+
+    @org.junit.Test
+    public  void testBit() throws InterruptedException {
+        Integer bitValue = 1335835260;
+        System.out.println(bitValue >> 9);
+        Calendar instance = Calendar.getInstance();
+        instance.setTimeInMillis(1619798400000l);
+        System.out.println(DateUtils.dateTimeToStr(instance.getTime()));
+    }
+
+    @org.junit.Test
+    public  void testStringReplace() {
+        StringBuilder builder = new StringBuilder();
+        String a = "select sum(case when act_property_id in (1,2,21,22) then 1 else 0 end) as REPORTNODE, sum(case when act_property_id in (3,4,23,24) then 1 else 0 end) as INSTNODE, sum(case when act_property_id in (5,6,25,26) then 1 else 0 end) as DISPATCHNODE, sum(case when act_property_id in (7) then 1 else 0 end) as DISPOSENODE, sum(case when act_property_id in (11,13) then 1 else 0 end) as CHECKNODE, sum(case when act_property_id in (12,14) then 1 else 0 end) as ARCHIVENODE, sum(case when act_property_id in (101) then 1 else 0 end) as ARCHIVED, sum(case when act_property_id in (7,101) then 1 else 0 end) as CSINSTNODE,sum(report_num) as CSREPORTNODE ,sum(postpone_num) AS POSTPONENODE, sum(back_num) AS BACKNODE ,sum(cancel_num) AS CANCELNODE ,sum(overtime_to_dispose_num) AS OVERTIMETODISPOSENUM from to_stat_info where 1 = 1 and create_time > " 
+               + "str_to_date('2021-06-17 00:00:00','%Y-%m-%d %H:%i:%S')"
+               + " and create_time < str_to_date('2021-06-17 23:59:59','%Y-%m-%d %H:%i:%S') and patrol_deal_flag != 1  and main_type_id not in (80269,80270)";
+        builder.append(a);
+        String b = builder.toString().replace("sum(case when act_property_id in (5,6,25,26) then 1 else 0 end) as DISPATCHNODE","sum(case when act_property_id in (6) then 1 else 0 end) as DISPATCHNODE");
+        builder = new StringBuilder();
+        builder.append(b);
+        System.out.println(b);
+    }
+    
 }

@@ -1,10 +1,17 @@
 package cn.com.egova;
 
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
@@ -29,19 +36,61 @@ public class UrlEncode {
 	 * 获取文件流
 	 */
 	static void getFileInputStream(){
-		String url = "http://localhost:8080/eUrbanMIS/mediadl/media/getdata/export/1141/export_2020-12-15_163446.xlsx";
-		try{
-			URL urlCon = new URL(url);
-			URLConnection conn = urlCon.openConnection();
-			// 设置通用的请求属性
-			conn.setRequestProperty("accept", "*/*");
-			conn.setRequestProperty("connection", "Keep-Alive");
-			conn.setConnectTimeout(1000);
-			conn.setReadTimeout(1000);
-			InputStream inStream = conn.getInputStream();
-			
-		} catch (Exception e){
-			System.out.println("出错了"+e.getMessage());
+		String strUrl = "http://118.26.0.88:8080/eUrbanGIS-ceshi/home/gis/map/getcellnamebyxy.htm?coordX=116.16981347282874&coordY=39.73566775282287";
+		String cellCode = null;
+		HttpURLConnection conn = null;
+		Document xmlDoc = null;
+		InputStream inputStream = null;
+		//向gis发送请求获取xml
+		try {
+			URL servletURL = new URL(strUrl);
+			conn = (HttpURLConnection) servletURL.openConnection();
+
+			//通知此连接我们将要发送output并且要接收input
+			conn.setConnectTimeout(5*1000);
+			conn.setReadTimeout(5*1000);
+			conn.setDoInput(true);
+			conn.setDoOutput(true);
+			//不能使用URL connection的缓存。
+			conn.setUseCaches(false);
+			conn.setDefaultUseCaches(false);
+			conn.setRequestProperty("Content-Type", "application/octet-stream");
+			conn.connect();
+
+			DocumentBuilderFactory factory = null;
+			DocumentBuilder builder = null;
+			factory = DocumentBuilderFactory.newInstance();
+			builder = factory.newDocumentBuilder();
+			inputStream = conn.getInputStream();
+			if (null != inputStream) {
+				xmlDoc = builder.parse(inputStream);
+				//解析xml
+				Element elmtRoot = null;
+				elmtRoot = xmlDoc.getDocumentElement();
+				Text nodeText = null;
+				NodeList ndList = null;
+				ndList = elmtRoot.getElementsByTagName("CellName");
+				if (ndList != null && ndList.getLength() > 0) {
+					nodeText = (Text) ndList.item(0).getFirstChild();
+					if (nodeText != null) {
+						cellCode = nodeText.getNodeValue();
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("error"+e.getMessage());
+		} finally {
+			try {
+				if (null != inputStream) {
+					inputStream.close();
+				}
+				if (null != conn) {
+					conn.disconnect();
+				}
+			} catch (Exception e) {
+				System.out.println("error"+e.getMessage());
+			}
+
 		}
 	}
 }
