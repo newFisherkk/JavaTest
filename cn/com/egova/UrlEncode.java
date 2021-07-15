@@ -36,7 +36,7 @@ public class UrlEncode {
 	 * 获取文件流
 	 */
 	static void getFileInputStream(){
-		String strUrl = "http://118.26.0.88:8080/eUrbanGIS-ceshi/home/gis/map/getcellnamebyxy.htm?coordX=116.16981347282874&coordY=39.73566775282287";
+		String strUrl = "http://118.26.0.88:8080/eUrbanGIS-ceshi/home/gis/map/getcellnamebyxy.htm?coordX=12929844&coordY=4802713.5";
 		String cellCode = null;
 		HttpURLConnection conn = null;
 		Document xmlDoc = null;
@@ -44,6 +44,7 @@ public class UrlEncode {
 		//向gis发送请求获取xml
 		try {
 			URL servletURL = new URL(strUrl);
+			//HttpURLConnection不能调用自己服务器得ip，会报拒绝连接
 			conn = (HttpURLConnection) servletURL.openConnection();
 
 			//通知此连接我们将要发送output并且要接收input
@@ -74,6 +75,7 @@ public class UrlEncode {
 					nodeText = (Text) ndList.item(0).getFirstChild();
 					if (nodeText != null) {
 						cellCode = nodeText.getNodeValue();
+						System.out.println(cellCode);
 					}
 				}
 			}

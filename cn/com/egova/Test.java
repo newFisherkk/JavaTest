@@ -2,6 +2,7 @@ package cn.com.egova;
 
 import cn.com.egova.base.tools.BeanUtils;
 import cn.com.egova.base.tools.DateUtils;
+import cn.com.egova.base.tools.FileUtils;
 import cn.com.egova.bean.CreatorDTO;
 import cn.com.egova.bean.MediaParams;
 import cn.com.egova.hzws.common.bean.CommonResult;
@@ -16,11 +17,12 @@ import com.alibaba.xxpt.gateway.shared.client.http.PostClient;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import javafx.beans.binding.ObjectExpression;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.springframework.util.CollectionUtils;
 import sun.misc.BASE64Encoder;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -453,5 +455,40 @@ public class Test {
         builder.append(b);
         System.out.println(b);
     }
-    
+
+
+    @org.junit.Test
+    public  void testThreadState() {
+        Thread t = new Thread(() -> {
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        t.start();
+        System.out.println(t.getState());
+        try {
+            sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(t.getState());
+    }
+
+    @org.junit.Test
+    public  void addNull2List() {
+        Set<Integer> integers = new HashSet<>();
+        System.out.println(integers.size());
+        integers.add(null);
+        integers.add(null);
+        System.out.println(integers.size());
+        System.out.println(CollectionUtils.isEmpty(integers));
+    }
+
+    @org.junit.Test
+    public  void listAllFile() {
+        File tempFilePath = FileUtils.createTempFolder("test");
+        File[] files = tempFilePath.listFiles();
+    }
 }
